@@ -20,7 +20,7 @@ function App() {
     const [isModalClienteOpen, setIsModalClienteOpen] = useState(false)
     const [isModalModeloOpen, setIsModalModeloOpen] = useState(false)
     const [atualizarTabela, setAtualizarTabela] = useState(false)
-    const [toast, setToast] = useState({ show: false, message: "", type: "success" });
+    const [toasts, setToasts] = useState([]);
 
     const modais = {
         parcelamento: {
@@ -50,13 +50,16 @@ function App() {
         modais.parcelamento?.abrir?.();  // abre a modal parcelamento
     };
 
-    const showToast = (message, type = "success") => {
-        setToast({ show: true, message, type });
+    const showToast = (message, type = "success", duration = 4000) => {
+        const id = Date.now(); // ID único
+        setToasts(prev => [{ id, message, type }, ...prev]); // 👈 adiciona no início
+
+        setTimeout(() => {
+            setToasts(prev => prev.filter(t => t.id !== id));
+        }, duration);
     };
 
-    const closeToast = () => {
-        setToast({ ...toast, show: false });
-    };
+
 
     return (
         <>
@@ -68,16 +71,23 @@ function App() {
             <ModalExtrato isOpen={isModalExtratoOpen} onClose={modais.extrato.fechar} />
             <ModalCliente isOpen={isModalClienteOpen} onClose={fecharClienteAbrirParcelamento} setAtualizarTabela={setAtualizarTabela} showToast={showToast}/>
             <ModalModelo isOpen={isModalModeloOpen} onClose={modais.modelo.fechar} />
-            <AnimatePresence>
-                {toast.show && (
-                    <Toast
-                        message={toast.message}
-                        type={toast.type}
-                        onClose={closeToast}
-                        duration={4000}
-                    />
-                )}
-            </AnimatePresence>
+            {/* Toast Container */}
+            <div className="fixed top-4 right-4 flex flex-col gap-2 z-50">
+                <AnimatePresence>
+                    {toasts.map(toast => (
+                        <Toast
+                            key={toast.id}
+                            message={toast.message}
+                            type={toast.type}
+                            onClose={() =>
+                                setToasts(prev => prev.filter(t => t.id !== toast.id))
+                            }
+                            duration={4000}
+                        />
+                    ))}
+                </AnimatePresence>
+            </div>
+
         </>
     )
 }

@@ -7,70 +7,80 @@ const ModalImportacao = ({ isOpen, onClose, modais, showToast, setAtualizarTabel
     const [show, setShow] = useState(false);
     const [arquivo, setArquivo] = useState(null);
 
+    // Estados para spinner e progresso
+    const [importando, setImportando] = useState(false);
+    const [progresso, setProgresso] = useState(0);
+
     const confirmarImportacao = async () => {
         if (!arquivo) {
             alert("Selecione um arquivo antes de confirmar.");
             return;
         }
 
-        const reader = new FileReader();
+        setImportando(true);  // ativa o spinner
+        setProgresso(0);      // inicializa o progresso
 
+        const reader = new FileReader();
         reader.onload = async (e) => { // ✅ async aqui!
             const data = new Uint8Array(e.target.result);
             const workbook = XLSX.read(data, { type: "array" });
-
-            console.log("Planilhas:", workbook.SheetNames);
             const sheet = workbook.Sheets[workbook.SheetNames[0]];
             const json = XLSX.utils.sheet_to_json(sheet, { defval: "", raw: false });
-            console.log("Conteúdo da planilha:", json);
+            const total = json.length;
+
+            let parcelamentosCriados = 0; // contador
 
             // Iterando linha por linha de forma assíncrona
             for (const [index, linha] of json.entries()) {
-                console.log(`Linha ${index + 1}:`);
                 let clienteId = null;
 
                 try {
-                    const response = await fetch("http://127.0.0.1:8000/clientes", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                            nome: linha.cliente,
-                            cpf_cnpj: linha.cpf_cnpj,
-                            inscricao_estadual: linha.inscricao_estadual,
-                        }),
-                    });
+                    const response = await fetch("http://127.0.0.1:8000/clientes");
+                    const clientes = await response.json();
 
-                    if (!response.ok) {
-                        showToast("Erro ao criar cliente", "error");
-                        throw new Error("Erro ao cadastrar cliente");
+                    // Procura se já existe pelo CPF/CNPJ
+                    const clienteExistente = clientes.find(c => c.cpf_cnpj === linha.cpf_cnpj);
+
+                    if (clienteExistente) {
+                        clienteId = clienteExistente.id;
+                    } else {
+                        // Cria cliente se não existir
+                        const responseCriar = await fetch("http://127.0.0.1:8000/clientes", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                nome: linha.cliente,
+                                cpf_cnpj: linha.cpf_cnpj,
+                                inscricao_estadual: linha.inscricao_estadual
+                            })
+                        });
+
+                        if (!responseCriar.ok) throw new Error("Erro ao cadastrar cliente");
+                        const dataCriar = await responseCriar.json();
+                        clienteId = dataCriar.id;
                     }
 
-                    const data = await response.json();
-                    showToast("Cliente criado com sucesso!", "success");
-                    clienteId = data.id;
-                    console.log("Cliente cadastrado:", data);
-
                 } catch (error) {
-                    showToast("Erro de conexão", "error");
-                    console.error(error);
-                    alert(`Não foi possível cadastrar o cliente da linha ${index + 1}.`);
-                    continue;
+                    continue; // pula para a próxima linha
                 }
 
+
+                // Verifica se o parcelamento já existe
+                let parcelamentoExiste = false;
                 try {
+                    const respParcelamentos = await fetch("http://127.0.0.1:8000/parcelamentos");
+                    const parcelamentos = await respParcelamentos.json();
 
-                    console.log("Dados enviados para parcelamento:", {
-                        id_cliente: clienteId,
-                        nome_parcelamento: linha.nome_parcelamento,
-                        competencias_parceladas: linha.competencias_parceladas,
-                        parcelas: linha.quantidade_de_parcelas,
-                        ultima_parcela_paga: linha.ultima_parcela_paga,
-                        vencimento_parcela: linha.vencimento,
-                        data_inicio: linha.data_de_inicio
-                    });
+                    // Filtra pelo cliente e pelo nome do parcelamento
+                    parcelamentoExiste = parcelamentos.some(
+                        p => p.id_cliente === clienteId && p.nome_parcelamento === linha.nome_parcelamento
+                    );
 
+                    if (parcelamentoExiste) {
+                        continue; // pula para a próxima linha da planilha
+                    }
+
+                    // Se não existir, cria o parcelamento
                     const response = await fetch("http://127.0.0.1:8000/parcelamento", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -87,26 +97,27 @@ const ModalImportacao = ({ isOpen, onClose, modais, showToast, setAtualizarTabel
 
                     const data = await response.json();
                     if (response.ok) {
-                        showToast("Parcelamento criado com sucesso!", "success");
+                        parcelamentosCriados++;
                         setAtualizarTabela(prev => !prev);
                     } else {
-                        showToast("Erro ao criar parcelamento", "error");
-                        console.error("Erro na resposta:", data);
-                        if (data.detail) {
-                            // Mostra todas as mensagens do array
-                            const mensagens = data.detail.map(d => d.msg).join("\n");
-                            alert("Erro:\n" + mensagens);
-                        } else {
-                            alert("Erro: " + JSON.stringify(data));
-                        }
+                        alert("Erro: " + JSON.stringify(data));
                     }
 
                 } catch (err) {
                     console.error(err);
-                    showToast("Erro de conexão", "error");
                 }
+                // Atualiza o progresso
+                setProgresso(Math.round(((index + 1) / total) * 100));
             }
+            setImportando(false);  // desativa o spinner
             onClose(); // fecha modal após processar todas as linhas
+
+            // Mostra o toast correto
+            if (parcelamentosCriados > 0) {
+                showToast("Parcelamentos importados com sucesso!", "success");
+            } else {
+                showToast("Parcelamentos já existentes no sistema!", "info");
+            }
         };
         reader.readAsArrayBuffer(arquivo);
     };
@@ -161,6 +172,29 @@ const ModalImportacao = ({ isOpen, onClose, modais, showToast, setAtualizarTabel
                     <Button text="Confirmar" onClick={confirmarImportacao}/>
                 </div>
             </div>
+
+            {importando && (
+                <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div className="loader mb-4"></div>
+                    <div className="text-white font-bold">{progresso}%</div>
+                </div>
+            )}
+
+            <style>{`
+                .loader {
+                    border: 6px solid #f3f3f3;
+                    border-top: 6px solid #494443;
+                    border-radius: 50%;
+                    width: 50px;
+                    height: 50px;
+                    animation: spin 1s linear infinite;
+                }
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+            `}</style>
+
         </div>
     );
 }
