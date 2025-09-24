@@ -7,11 +7,11 @@ import { OPCOES_VENCIMENTO } from "../constants/opcoes";
 
 const baixarModelo = () => {
     const ws = XLSX.utils.aoa_to_sheet([
-        ["cliente", "cpf_cnpj", "inscricao_estadual", "nome_parcelamento", "competencias_parceladas", "quantidade_de_parcelas", "ultima_parcela_paga", "vencimento", "data_de_inicio"], // cabeçalhos
-        ["RNI CONTABILIDADE LTDA", "35034874000144", "9097779683", "SIMPLIFICADO 18.22-35", "CP SEGURADOS 2021, 11/2021, 01/2022, 05/2022, 06/2022", "60", "45", "Todo 1º dia útil", "01/2025"],
-        ["RNI CONTABILIDADE LTDA", "35034874000144", "9097779683", "SIMPLIFICADO 21.23-35", "CP SEGURADOS 09/2022, 10/2022, 01/2023, 03/2023, 04/2023, 06/2023, IRRF 06/2023", "20", "5", "Todo 5º dia útil", "12/2024"],
-        ["RNI CONTABILIDADE LTDA", "35034874000144", "9097779683", "SIMPLIFICADO 57.24-92", "CP SEGURADOS 2023, 07/2023, 09/2023 - 12/2023, IRRF 07/2023, 09/2023 - 08/2024", "10", "2", "Todo 15º dia útil", "01/2023"],
-        ["RNI CONTABILIDADE LTDA", "35034874000144", "9097779683", "SIMPLES NACIONAL Nº 01", "01/2022 - 04/2022", "150", "100", "Todo último dia útil", "04/2022"]
+        ["cliente", "cpf_cnpj", "inscricao_estadual", "nome_parcelamento", "competencias_parceladas", "quantidade_de_parcelas", "ultima_parcela_paga", "vencimento", "data_de_inicio", "link_de_acesso"], // cabeçalhos
+        ["RNI CONTABILIDADE LTDA", "35034874000144", "9097779683", "SIMPLIFICADO 18.22-35", "CP SEGURADOS 2021, 11/2021, 01/2022, 05/2022, 06/2022", "60", "45", "Todo 1º dia útil", "01/2025", ""],
+        ["RNI CONTABILIDADE LTDA", "35034874000144", "9097779683", "SIMPLIFICADO 21.23-35", "CP SEGURADOS 09/2022, 10/2022, 01/2023, 03/2023, 04/2023, 06/2023, IRRF 06/2023", "20", "5", "Todo 5º dia útil", "12/2024", ""],
+        ["RNI CONTABILIDADE LTDA", "35034874000144", "9097779683", "SIMPLIFICADO 57.24-92", "CP SEGURADOS 2023, 07/2023, 09/2023 - 12/2023, IRRF 07/2023, 09/2023 - 08/2024", "10", "2", "Todo 15º dia útil", "01/2023", ""],
+        ["RNI CONTABILIDADE LTDA", "35034874000144", "9097779683", "SIMPLES NACIONAL Nº 01", "01/2022 - 04/2022", "150", "100", "Todo último dia útil", "04/2022", "https://cav.receita.fazenda.gov.br/ecac/Aplicacao.aspx?id=78&origem=menu"]
     ]);
 
     const wb = XLSX.utils.book_new();
@@ -94,6 +94,9 @@ const ModalModelo = ({isOpen, onClose}) => {
                         ))}
                         <li className="flex gap-2">
                             <span className="font-semibold text-[#494443]">• Data de Início:</span> use o formato <code>MM/AAAA</code>, ex: "01/2025".
+                        </li>
+                        <li className="flex gap-2">
+                            <span className="font-semibold text-[#494443]">• Link de acesso:</span> cole o link no campo, ex: "https://cav.receita.fazenda.gov.br/autenticacao/login".
                         </li>
                     </ul>
 

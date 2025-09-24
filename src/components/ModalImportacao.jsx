@@ -91,7 +91,8 @@ const ModalImportacao = ({ isOpen, onClose, modais, showToast, setAtualizarTabel
                             parcelas: linha.quantidade_de_parcelas,
                             ultima_parcela_paga: linha.ultima_parcela_paga,
                             vencimento_parcela: linha.vencimento,
-                            data_inicio: linha.data_de_inicio
+                            data_inicio: linha.data_de_inicio,
+                            link_de_acesso: linha.link_de_acesso
                         })
                     });
 

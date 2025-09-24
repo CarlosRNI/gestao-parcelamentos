@@ -15,7 +15,8 @@ const ModalParcelamento = ({ isOpen, onClose, modais, setAtualizarTabela, showTo
         parcelas: "",
         ultimaParcelaPaga: "",
         vencimentoParcela: "Todo último dia útil",
-        dataInicio: ""
+        dataInicio: "",
+        linkAcesso: ""
     });
 
     const handleConfirmar = async () => {
@@ -31,7 +32,8 @@ const ModalParcelamento = ({ isOpen, onClose, modais, setAtualizarTabela, showTo
                     parcelas: formData.parcelas,
                     ultima_parcela_paga: formData.ultimaParcelaPaga,
                     vencimento_parcela: formData.vencimentoParcela,
-                    data_inicio: formData.dataInicio
+                    data_inicio: formData.dataInicio,
+                    link_de_acesso: formData.linkAcesso
                 })
             });
 
@@ -150,6 +152,12 @@ const ModalParcelamento = ({ isOpen, onClose, modais, setAtualizarTabela, showTo
                             onChange={e => setFormData({ ...formData, dataInicio: e.target.value })}
                         />
                     </div>
+                    <InputText
+                        text="Link de acesso"
+                        placeholder="Cole o link de acesso do parcelamento"
+                        value={formData.linkAcesso}
+                        onChange={e => setFormData({ ...formData, linkAcesso: e.target.value })}
+                    />
                 </form>
                 {/* Modal Footer */}
                 <div className="flex items-center justify-center gap-6 p-4 ring ring-[#494443] bg-[#494443] sm:rounded-b-lg">
