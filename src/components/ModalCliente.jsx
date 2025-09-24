@@ -39,7 +39,6 @@ const ModalCliente = ({ isOpen, onClose, setAtualizarTabela, showToast }) => {
 
             const data = await response.json();
             showToast("Cliente criado com sucesso!", "success");
-            console.log("Cliente cadastrado:", data);
 
             // Limpa o formulário e fecha modal
             setNome("");

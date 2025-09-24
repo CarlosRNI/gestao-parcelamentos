@@ -13,7 +13,6 @@ const TableRow = ({ cliente, atualizarTabela }) => {
         try {
             const res = await fetch(`http://127.0.0.1:8000/clientes/${cliente.id}/parcelamentos`);
             const data = await res.json();
-            console.log("Parcelamentos recebidos:", data);
             setDetalhes(data);
             setLastUpdated(Date.now()); // Marca o tempo da última atualização
         } catch (err) {
@@ -30,11 +29,6 @@ const TableRow = ({ cliente, atualizarTabela }) => {
             fetchDetalhes();
         }
     }, [expanded, atualizarTabela, fetchDetalhes]);
-
-    // useEffect adicional para debug - pode remover depois
-    useEffect(() => {
-        console.log(`Cliente ${cliente.nome}: atualizarTabela =`, atualizarTabela, "expanded =", expanded);
-    }, [atualizarTabela, expanded, cliente.nome]);
 
     const handleClick = () => {
         setExpanded(!expanded);

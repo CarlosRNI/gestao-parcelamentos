@@ -20,7 +20,6 @@ const ModalParcelamento = ({ isOpen, onClose, modais, setAtualizarTabela, showTo
     });
 
     const handleConfirmar = async () => {
-        console.log(formData)
         try {
             const response = await fetch("http://127.0.0.1:8000/parcelamento", {
                 method: "POST",

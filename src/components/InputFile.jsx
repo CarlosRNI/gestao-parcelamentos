@@ -21,7 +21,6 @@ const InputFile = ({ onChange }) => {
         const file = e.target.files[0];
         if (file && validateFile(file)) {
             setFileName(file.name);
-            console.log('Arquivo selecionado:', file);
             if (onChange) onChange(file);
         }
     };
@@ -31,7 +30,6 @@ const InputFile = ({ onChange }) => {
         const file = e.dataTransfer.files[0];
         if (file && validateFile(file)) {
             setFileName(file.name);
-            console.log('Arquivo arrastado:', file);
             if (onChange) onChange(file);
         }
     };
