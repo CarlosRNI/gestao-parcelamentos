@@ -21,6 +21,7 @@ function App() {
     const [isModalModeloOpen, setIsModalModeloOpen] = useState(false)
     const [atualizarTabela, setAtualizarTabela] = useState(false)
     const [toasts, setToasts] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
 
     const modais = {
         parcelamento: {
@@ -63,8 +64,8 @@ function App() {
 
     return (
         <>
-            <Header modais={modais} />
-            <Table atualizarTabela={atualizarTabela} />
+            <Header modais={modais} searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+            <Table atualizarTabela={atualizarTabela} searchTerm={searchTerm}/>
             <Footer />
             <ModalParcelamento modais={modais} isOpen={isModalParcelamentoOpen} onClose={modais.parcelamento.fechar} setAtualizarTabela={setAtualizarTabela} showToast={showToast}/>
             <ModalImportacao modais={modais} isOpen={isModalImportacaoOpen} onClose={modais.importacao.fechar} setAtualizarTabela={setAtualizarTabela} showToast={showToast}/>

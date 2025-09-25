@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react'
 import TableRow from "./TableRow.jsx";
 
-const Table = ({atualizarTabela}) => {
+const Table = ({ atualizarTabela, searchTerm }) => {
 
     const [clientes, setClientes] = useState([]);
 
@@ -12,10 +12,16 @@ const Table = ({atualizarTabela}) => {
             .catch(err => console.error("Erro ao buscar clientes:", err));
     }, [atualizarTabela]);
 
+    // Aplica o filtro apenas se houver algo digitado
+    const clientesParaExibir = searchTerm
+        ? clientes.filter(cliente =>
+            cliente.nome?.toLowerCase().includes(searchTerm.toLowerCase())            )
+        : clientes;
+
     return (
 
         <div className="relative overflow-x-auto shadow-md sm:rounded-lg mt-6">
-            <table className="min-w-[1200px] text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <table className="min-w-[1280px] text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                 <thead className="text-xs text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                     <tr>
                         <th scope="col" className="px-6 py-3">
@@ -33,8 +39,8 @@ const Table = ({atualizarTabela}) => {
                     </tr>
                 </thead>
                 <tbody>
-                {clientes.length > 0 ? (
-                    clientes.map(cliente => (
+                {clientesParaExibir.length > 0 ? (
+                    clientesParaExibir.map(cliente => (
                         <TableRow key={cliente.id} cliente={cliente} atualizarTabela={atualizarTabela} />
                     ))
                 ) : (

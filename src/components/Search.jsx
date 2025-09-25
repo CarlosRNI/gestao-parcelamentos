@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Search = () => {
+const Search = ( { searchTerm, setSearchTerm }) => {
     return (
         <form>
             <label for="search" className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
@@ -12,6 +12,8 @@ const Search = () => {
                 </div>
                 <input
                     type="search"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                     className="shadow-md sm:rounded-lg block w-full p-4 ps-10 text-sm focus:outline-none text-[#494443] border border-gray-300 rounded-lg bg-gray-50 focus:ring-[#494443] focus:border-[#494443] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-[#494443] dark:focus:border-[#494443]"
                     placeholder="Digite o nome do cliente para filtrar"
                 />

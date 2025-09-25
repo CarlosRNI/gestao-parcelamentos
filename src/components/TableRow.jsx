@@ -23,7 +23,10 @@ const TableRow = ({ cliente, atualizarTabela }) => {
         }
     }, [cliente.id]);
 
-    // CORREÇÃO: useEffect simplificado para recarregar quando necessário
+    useEffect(() => {
+        fetchDetalhes(); // busca sempre ao montar
+    }, [fetchDetalhes]);
+
     useEffect(() => {
         if (expanded) {
             fetchDetalhes();
@@ -39,7 +42,7 @@ const TableRow = ({ cliente, atualizarTabela }) => {
             <tr
                 className={`cursor-pointer border-t dark:border-gray-700 border-gray-200 transition-colors duration-200 ${
                     expanded
-                        ? 'bg-gray-50'
+                        ? 'bg-gray-100'
                         : 'bg-white hover:bg-gray-50'
                 }`}
                 onClick={handleClick}
@@ -99,7 +102,7 @@ const TableRow = ({ cliente, atualizarTabela }) => {
                                                 <td className="px-6 py-4 text-left">{p.competencias_parceladas}</td>
                                                 <td className="px-6 py-4 text-center">{p.parcela_atual}</td>
                                                 <td className="px-6 py-4 text-center">{p.status_parcelamento}</td>
-                                                <td className="px-6 py-4 text-center">{p.link_de_acesso !== '-' ?
+                                                <td className="px-6 py-4 text-center">{p.link_de_acesso !== '-' && p.link_de_acesso !== '' ?
                                                     <a
                                                         href={p.link_de_acesso}
                                                         target="_blank"
