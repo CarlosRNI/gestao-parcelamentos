@@ -41,7 +41,10 @@ const Table = ({ atualizarTabela, searchTerm }) => {
                 <tbody>
                 {clientesParaExibir.length > 0 ? (
                     clientesParaExibir.map(cliente => (
-                        <TableRow key={cliente.id} cliente={cliente} atualizarTabela={atualizarTabela} />
+                        <TableRow
+                            key={cliente.id}
+                            cliente={cliente}
+                            atualizarTabela={atualizarTabela} />
                     ))
                 ) : (
                     <tr>
